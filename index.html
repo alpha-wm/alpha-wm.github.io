@@ -10,9 +10,13 @@
 alert("ok"); 
 
   }, function() { 
-     // API initialization failed 
-     // Can reload page here 
+     
+alert("no ok");
+
 }, '5.68'); 
+
+VK.api("photos.getMarketUploadServer", {"group_id": 153491362, "main_photo": 1, "crop_x": 400, "crop_y": 400, "crop_width": 400}, function (data) {alert("foto upload...");});
+
 </script>
 
 </head>
