@@ -192,9 +192,9 @@ Error message and password prompt
 
 <li>$:/_Moneta.ru</li>
 
-<li>$:/_MyBag</li>
-
 <li>$:/_mybag</li>
+
+<li>$:/_MyBag</li>
 
 <li>$:/_mybag_total</li>
 
@@ -583,6 +583,8 @@ Error message and password prompt
 <li>$:/palettes/Sushi_red</li>
 
 <li>$:/plugins/ahahn/tinka/search-filter</li>
+
+<li>$:/plugins/heeg/API_vk</li>
 
 <li>$:/plugins/heeg/Theme</li>
 
@@ -3112,12 +3114,12 @@ result
 
 </pre>
 </div>
+<div created="20141029120324337" modified="20160605104037606" title="$:/_mybag" type="text/vnd.tiddlywiki">
+<pre></pre>
+</div>
 <div created="20160224173359657" modified="20170520122918900" tags="" title="$:/_MyBag">
 <pre> &lt;div class =&quot;korzinka3&quot;  &gt; 		&lt;div class=&quot;simpleCart_hide&quot;&gt; &lt;a class=&quot;simpleCart_total&quot;&gt; Корзина пуста&lt;/a&gt;
 &lt;/div&gt; &lt;div  class=&quot;orange&quot; style=&quot;height: 100%; width: 50px; position: absolute; top: 0px; right: 0px;  box-shadow: 0px 0px 0px 1px #eee; &quot;&gt; {{$:/_aa/button/Cart}}    &lt;/div&gt; &lt;/div&gt;</pre>
-</div>
-<div created="20141029120324337" modified="20160605104037606" title="$:/_mybag" type="text/vnd.tiddlywiki">
-<pre></pre>
 </div>
 <div created="20150207094915185" modified="20151029173344674" title="$:/_mybag_total" type="text/vnd.tiddlywiki">
 <pre>&lt;div class=&quot;Cart_total&quot;&gt; &lt;span class=&quot;simpleCart_total&quot;&gt;&lt;/span&gt;&lt;/div&gt; </pre>
@@ -20660,6 +20662,19 @@ Enter Filterstring to select tiddlers: &lt;$edit-text tiddler=&quot;$:/temp/tink
 &lt;/ul&gt;
 </pre>
 </div>
+<div author="VK" description="Плагин API Вконтакте" plugin-type="plugin" title="$:/plugins/heeg/API_vk" type="application/json" version="0.0.3">
+<pre>{
+    &quot;tiddlers&quot;: {
+        &quot;$:/_plugin/API_vk&quot;: {
+            &quot;text&quot;: &quot;`\n&lt;script&gt; \n\n\n(function(w) {\nif (w.fastXDM) return;\n\nvar handlers = {};\nvar onEnvLoad = [];\nvar env = {};\n\n// Key generation\nfunction genKey() {\n  var key = '';\n  for (i=0;i&lt;5;i++) key += Math.ceil(Math.random()*15).toString(16);\n  return key;\n}\nfunction waitFor(obj, prop, func, self,  count) {\n  if (obj[prop]) {\n     func.apply(self);\n  } else {\n    count = count || 0;\n    if (count &lt; 1000) setTimeout(function() {\n      waitFor(obj, prop, func, self, count + 1);\n    }, 0);\n  }\n}\nfunction attachScript(url) {\n  setTimeout(function() {\n    var newScript = document.createElement('script');\n    newScript.type = 'text/javascript';\n    newScript.src = url || w.fastXDM.helperUrl;\n    waitFor(document, 'body', function() {\n      document.getElementsByTagName('HEAD')[0].appendChild(newScript);\n    });\n  }, 0);\n}\n\n// Env functions\nfunction getEnv(callback, self) {\n  if (env.loaded) {\n    callback.apply(self, [env]);\n  } else {\n    onEnvLoad.push([self, callback]);\n  }\n}\n\nfunction envLoaded() {\n  env.loaded = true;\n  var i = onEnvLoad.length;\n  while (i--) {\n    onEnvLoad[i][1].apply(onEnvLoad[i][0], [env]);\n  }\n}\n\nfunction applyMethod(strData, self) {\n  getEnv(function(env) {\n    var data = env.json.parse(strData);\n    if (data[0]) {\n      if (!data[1]) data[1] = [];\n      var i = data[1].length;\n      while (i--) {\n        if (data[1][i]._func) {\n          var funcNum = data[1][i]._func;\n          data[1][i] = function() {\n            var args = Array.prototype.slice.call(arguments);\n            args.unshift('_func'+funcNum);\n            self.callMethod.apply(self, args);\n          };\n        }\n      }\n      setTimeout(function() {\n        if (!self.methods[data[0]]) throw Error('fastXDM: Method ' + data[0] + ' is undefined');\n        self.methods[data[0]].apply(self, data[1]);\n      }, 0);\n    }\n  });\n}\n// XDM object\nw.fastXDM = {\n  _id: 0,\n  helperUrl: ((location.protocol === 'https:') ? 'https:' : 'http:') + '//vk.com/js/api/xdmHelper.js',\n\n  Server: function(methods, filter) {\n    this.methods = methods || {};\n    this.id = w.fastXDM._id++;\n    this.filter = filter;\n    this.key = genKey();\n    this.methods['%init%'] = this.methods['__fxdm_i'] = function() {\n      w.fastXDM.run(this.id);\n      if (this.methods['onInit']) this.methods['onInit']();\n    };\n    this.frameName = 'fXD'+this.key;\n    this.server = true;\n    handlers[this.key] = [applyMethod, this];\n  },\n\n  Client: function(methods) {\n    this.methods = methods || {};\n    this.id = w.fastXDM._id++;\n    w.fastXDM.run(this.id);\n    if (window.name.indexOf('fXD') == 0) {\n      this.key = window.name.substr(3);\n    } ;\n\n    this.caller = window.parent;\n    handlers[this.key] = [applyMethod, this];\n    this.client = true;\n\n    w.fastXDM.on('helper', function() {\n      w.fastXDM.onClientStart(this);\n    }, this);\n\n    getEnv(function(env) {\n      env.send(this, env.json.stringify(['%init%']));\n      var methods = this.methods;\n      setTimeout(function() {\n        if (methods['onInit']) methods['onInit']();\n      }, 0);\n    }, this);\n  },\n\n\n\n  setJSON: function(json) {\n    env.json = json;\n  },\n\n  getJSON: function(callback) {\n    if (!callback) return env.json;\n    getEnv(function(env) {\n      callback(env.json);\n    });\n  },\n\n  setEnv: function(exEnv) {\n    for (i in exEnv) {\n      env[i] = exEnv[i];\n    }\n    envLoaded();\n  },\n\n  _q: {},\n\n  on: function(key, act, self) {\n    if (!this._q[key]) this._q[key] = [];\n    if (this._q[key] == -1) {\n      act.apply(self);\n    } else {\n      this._q[key].push([act, self]);\n    }\n  },\n\n  run: function(key) {\n    var len = (this._q[key] || []).length;\n    if (this._q[key] &amp;&amp; len &gt; 0) {\n      for (var i = 0; i &lt; len; i++) this._q[key][i][0].apply(this._q[key][i][1]);\n    }\n    this._q[key] = -1;\n  },\n\n  waitFor: waitFor\n};\n\nw.fastXDM.Server.prototype.start = function(obj, count) {\n  if (obj.contentWindow) {\n    this.caller = obj.contentWindow;\n    this.frame = obj;\n\n    w.fastXDM.on('helper', function() {\n      w.fastXDM.onServerStart(this);\n    }, this);\n\n  } else { // Opera old versions\n    var self = this;\n    count = count || 0;\n    if (count &lt; 50) setTimeout(function() {\n      self.start.apply(self, [obj, count+1]);\n    }, 100);\n  }\n};\n\nfunction extend(obj1, obj2){\n  for (var i in obj2) {\n    if (obj1[i] &amp;&amp; typeof(obj1[i]) == 'object') {\n      extend(obj1[i], obj2[i]);\n    } else {\n      obj1[i] = obj2[i];\n    }\n  }\n}\n\nw.fastXDM.Server.prototype.append = function(obj, options) {\n  var div = document.createElement('DIV');\n  div.innerHTML = '&lt;iframe name=\&quot;'+this.frameName+'\&quot; /&gt;';\n  var frame = div.firstChild;\n  var self = this;\n  setTimeout(function() {\n    frame.frameBorder = '0';\n    if (options) extend(frame, options);\n    obj.insertBefore(frame, obj.firstChild);\n    self.start(frame);\n  }, 0);\n  return frame;\n};\n\nw.fastXDM.Client.prototype.callMethod = w.fastXDM.Server.prototype.callMethod = function() {\n  var args = Array.prototype.slice.call(arguments);\n  var method = args.shift();\n  var i = args.length;\n  while (i--) {\n    if (typeof(args[i]) == 'function') {\n      this.funcsCount = (this.funcsCount || 0) + 1;\n      var func = args[i];\n      var funcName = '_func' + this.funcsCount;\n      this.methods[funcName] = function() {\n        func.apply(this, arguments);\n        delete this.methods[funcName];\n      };\n      args[i] = {_func: this.funcsCount};\n    }\n  }\n  waitFor(this, 'caller', function() {\n    w.fastXDM.on(this.id, function() {\n      getEnv(function(env) {\n        env.send(this, env.json.stringify([method, args]));\n      }, this);\n    }, this);\n  }, this);\n};\n\nif (w.JSON &amp;&amp; typeof(w.JSON) == 'object' &amp;&amp; w.JSON.parse &amp;&amp; w.JSON.stringify &amp;&amp; w.JSON.stringify({a:[1,2,3]}).replace(/ /g, '') == '{\&quot;a\&quot;:[1,2,3]}') {\n  env.json = {parse: w.JSON.parse, stringify: w.JSON.stringify};\n} else {\n  w.fastXDM._needJSON = true;\n}\n\n// PostMessage cover\nif (w.postMessage) {\n  env.protocol = 'p';\n  env.send = function(xdm, strData) {\n    // alert(key+':'+strData);\n    xdm.caller.postMessage(xdm.key+':'+strData, \&quot;*\&quot;);\n  };\n  if (w.addEventListener) {\n    w.addEventListener(\&quot;message\&quot;, w.fastXDM.onMessage, false);\n  } else {\n    w.attachEvent(\&quot;onmessage\&quot;, w.fastXDM.onMessage);\n  }\n\n  if (w.fastXDM._needJSON) {\n    w.fastXDM._onlyJSON = true;\n    attachScript();\n  } else {\n    envLoaded();\n  }\n} else {\n  attachScript();\n}\n})(window);\n\nif (typeof(VK) == 'undefined') VK = {};\n\nVK._Rpc = null;\nVK._v = false;\nVK._callbacks = {};\nVK._initQueue = [];\nVK._inited = false;\n\nVK.init = function(success, failure, ver) {\n  if (ver) {\n    VK._v = ver;\n  }\n  if (!VK._inited) {\n  \tVK._inited = true;\n    if (!parent) failure();\n    window.vk_onConnectionInit = function() {\n      if (VK.isFunc(success)) success();\n    };\n    VK.initXDConn();\n  } else {\n    if (VK.isFunc(success)) success();\n  }\n};\n\nVK.initXDConn = function() {\n\n  if (window.name.length &gt; 10) {\n\n\n\n  } else {\n    VK.fxdm = true;\n    VK._Rpc = new fastXDM.Client({\n      onInit: function() {\n          while (VK._initQueue.length &gt; 0) {\n            var func = VK._initQueue.pop();\n            if (VK.isFunc(func)) func();\n          }\n        window.vk_onConnectionInit();\n      },\n      runCallback: function(args) {\n        var eventName;\n        eventName = args.shift();\n        if (VK.isFunc(VK._callbacks[eventName])) VK._callbacks[eventName].apply(VK,args);\n      },\n      getHeight: function(callback) {\n        var calcHeight = function() {\n          var height = document.body.offsetHeight;\n          if (height) {\n            if (window.getComputedStyle !== undefined) {\n              var st = window.getComputedStyle(document.body, null);\n              height += parseInt(st.getPropertyValue('margin-top').replace('px', ''));\n              height += parseInt(st.getPropertyValue('margin-bottom').replace('px', ''));\n            } else {\n              height += parseInt(document.body.currentStyle['marginTop'].replace('px', ''));\n              height += parseInt(document.body.currentStyle['marginBottom'].replace('px', ''));\n            }\n            return height;\n          } else {\n            return document.body.scrollHeight;\n          }\n        };\n        var resize = function() {\n          VK._Rpc.callMethod('setHeight', calcHeight());\n        };\n\n        setInterval(resize, 1000);\n        document.addEventListener(\&quot;click\&quot;, function() {\n          setTimeout(resize, 0);\n        }, false);\n        document.addEventListener(\&quot;DOMSubtreeModified\&quot;, function() {\n          setTimeout(resize, 0);\n        });\n        return callback(calcHeight());\n      }\n    });\n\n    VK._Rpc.ApiCall = function(args, callback) {\n      VK._Rpc.callMethod('ApiCall', args, callback);\n    };\n  }\n};\n\nVK.callMethod = function() {\n  var args = Array.prototype.slice.call(arguments);\n  var callback;\n  if (VK._Rpc != null) {\n    if (VK.fxdm) {\n      VK._Rpc.callMethod.apply(VK._Rpc, args);\n    } else {\n      if (VK.isFunc(args[args.length-1])) callback = args.pop();\n      VK._Rpc.callMethod(args,callback);\n    }\n  } else {\n    VK._initQueue.push(function() {VK.callMethod.apply(VK, args);});\n    VK.init();\n  }\n};\n\nVK.addCallback = function(eventName, callback) {\n  if (callback) VK._callbacks[eventName] = callback;\n};\n\nVK.removeCallback = function(eventName) {\n  if (VK._callbacks[eventName]) delete VK._callbacks[eventName];\n};\n\nVK.isFunc = function(obj) {\n  return Object.prototype.toString.call(obj) === \&quot;[object Function]\&quot;;\n};\n\nVK.params = {};\n\nVK.loadParams = function(q) {\n  if (typeof q == 'Object') VK.params = q;\n  else {\n    var tmp = q.substr(q.indexOf('?') + 1).split('&amp;');\n    var i = tmp.length;\n    while (i--) {\n      var v = tmp[i].split('=');\n      VK.params[v[0]] = decodeURIComponent(v[1]);\n    }\n  }\n};\n\nVK.addScript = function(url) {\n  var el = document.createElement('script');\n  el.type = 'text/javascript';\n  el.src = url;\n  document.getElementsByTagName('head')[0].appendChild(el);\n};\n\nVK.api = function() {\n  var args = Array.prototype.slice.call(arguments);\n  var callback;\n  if (VK._Rpc != null) {\n    if (VK.isFunc(args[args.length-1])) {\n      callback = args.pop();\n    }\n    if (!args[1]) {\n      args[1] = {};\n    }\n    if (!args[1]['v'] &amp;&amp; VK._v) {\n      args[1]['v'] = VK._v;\n    }\n    VK._Rpc.ApiCall(args,callback);\n  } else {\n    VK._initQueue.push(function() {VK.api.apply(VK, args);});\n    VK.init();\n  }\n};\n\nVK.Modules = {\n  callbacks: {},\n  loaded: function(name) {\n    if (this.callbacks[name]) {\n      var i = this.callbacks[name].length;\n      while (i--) {\n        if (VK.isFunc(this.callbacks[name][i])) this.callbacks[name][i]();\n      }\n    }\n  },\n  load: function(name, callback, path) {\n    if (!this.callbacks[name]) {\n      this.callbacks[name] = [callback];\n      if (path == null) path = 'http://vk.com/js/api/modules/' + name + '.js';\n      VK.addScript(path);\n    } else {\n      this.callbacks[name].push(callback);\n    }\n  }\n};\n\nVK.showPortlet = function(opts) {\n  VK.callMethod('showPortlet', opts);\n};\n\nif (VK._protocol !== 'https:') {\n  VK._protocol = ((location.protocol === 'https:') ? 'https:' : 'http:');\n}\nif (VK._protocol !== 'https:') {\n  VK.callMethod('getLocationProtocol', function(protocol) {\n    if (protocol === 'https:') {\n      VK._protocol = 'https:';\n    }\n  });\n}\n(function(){\n  try {\n    var scripts = document.getElementsByTagName('script');\n    var script = scripts[scripts.length - 1];\n    VK._base_domain = script.src.match(/^https?:\\/\\/((?:\\w+\\.)*vk.com)/)[1];\n  } catch (e) {}\n})();\n\nif (!VK.Widgets) {\n  VK.Widgets = (function() {\n    var obj = {};\n    var widgetlist = ['Comments', 'CommentsBrowse', 'Auth', 'Group', 'Post', 'Donate', 'Like', 'Poll', 'Recommended', 'Subscribe', 'Ads'];\n    VK.xdConnectionCallbacks = [];\n    var i = widgetlist.length;\n    while (i--) (function(f) {\n      obj[f] = function() {\n        var args = arguments;\n\n        VK.xdConnectionCallbacks.push(function() {\n          VK._iframeAppWidget = true;\n          VK.Widgets[f].apply(VK, args);\n        });\n\n        if (!VK._openApiAttached) {\n          VK.callMethod('_getAppInfo', function(data) {\n            var baseDomain = ((VK._base_domain &amp;&amp; VK._base_domain.match(/^(\\w+\\.)*vk.com$/)) ? VK._base_domain : 'vk.com');\n            VK._apiId = data[0];\n            VK._browserHash = data[1];\n            VK.addScript(VK._protocol + '//' + baseDomain + '/js/api/openapi.js?116');\n          });\n          VK._openApiAttached = true;\n        }\n\n      };\n    })(widgetlist[i]);\n    return obj;\n  })();\n}\n\n\n/* Obsolete methods */\nVK.External={showPaymentBox:function(a){VK.callMethod(\&quot;showPaymentBox\&quot;,a);},showSettingsBox:function(a){VK.callMethod(\&quot;showSettingsBox\&quot;,a);},showInstallBox:function(){VK.callMethod(\&quot;showInstallBox\&quot;);},showInviteBox:function(){VK.callMethod(\&quot;showInviteBox\&quot;);},resizeWindow:function(b,a){VK.callMethod(\&quot;resizeWindow\&quot;,b,a);},scrollWindow:function(b,a){VK.callMethod(\&quot;scrollWindow\&quot;,b,a);},setLocation:function(a,b){VK.callMethod(\&quot;setLocation\&quot;,a,b);},setTitle:function(a){VK.callMethod(\&quot;setTitle\&quot;,a);},saveWallPost:function(a){VK.callMethod(\&quot;saveWallPost\&quot;,a);},showProfilePhotoBox:function(a){VK.callMethod(\&quot;showProfilePhotoBox\&quot;,a);},showMerchantPaymentBox:function(a){VK.callMethod(\&quot;showMerchantPaymentBox\&quot;,a);}};\n\n\nfunction onLocationChanged(loc) {\n    if(window.location.pathname != loc &amp;&amp; loc != '') {\n        window.location.href = window.location.toString().split('#')[0] +\&quot;#\&quot;+ loc;\n    }\n}\n\nfunction vkwidth() {\nvar vkwidth=document.querySelector('[title=\&quot;$:/constant/_vkwidth\&quot;] &gt; pre').innerHTML;\n\nVK.init(function() {\n\nVK.callMethod(\&quot;resizeWindow\&quot;, vkwidth, document.body.scrollHeight+40);\n\nVK.callMethod(\&quot;setLocation\&quot;, location.hash.slice(1));\n VK.addCallback('onLocationChanged', onLocationChanged);\n\n\n\n});\n}\n\n\n\nfunction modalTop() {\nVK.addCallback('onScrollTop', function(scroll){\nnewscroll=scroll-80;\ndocument.querySelector('.tc-modal').style.top = newscroll + 'px'; \n\n});\nVK.callMethod('scrollTop'); \n\n}\n\n\n\n\n\n\n\n\n&lt;/script&gt;\n`&quot;,
+            &quot;type&quot;: &quot;application/javascript&quot;,
+            &quot;title&quot;: &quot;$:/_plugin/API_vk&quot;,
+            &quot;modified&quot;: &quot;20170801172714363&quot;,
+            &quot;created&quot;: &quot;20160203121519906&quot;
+        }
+    }
+}</pre>
+</div>
 <div author="VoroninD" core-version="&gt;=5.1.14" description="Контрастная черно-белая тема" name="Черная" plugin-type="plugin" title="$:/plugins/heeg/Theme" type="application/json" version="1.0.3">
 <pre>{
     &quot;tiddlers&quot;: {
@@ -21212,14 +21227,14 @@ background-color: $(swatchColour)$;
 <div created="20170509152940441" modified="20170509152940441" title="$:/state/ShowPaletteEditor">
 <pre>yes</pre>
 </div>
-<div created="20170426181002654" modified="20170929063212065" title="$:/state/sidebar">
+<div created="20170426181002654" modified="20171021190420534" title="$:/state/sidebar">
 <pre>no</pre>
 </div>
 <div created="20170709063637458" modified="20170709063639714" title="$:/state/tab--1135826050">
 <pre>$:/_aa/sort/nazvanieup</pre>
 </div>
-<div created="20170523180035573" modified="20170830024838960" title="$:/state/tab--127417445">
-<pre>$:/core/ui/ControlPanel/Plugins/Add/Themes</pre>
+<div created="20170523180035573" modified="20171021185225736" title="$:/state/tab--127417445">
+<pre>$:/core/ui/ControlPanel/Plugins/Add/Plugins</pre>
 </div>
 <div created="20170426182616550" modified="20170830031718837" title="$:/state/tab--1498284803">
 <pre>$:/core/ui/AdvancedSearch/System</pre>
@@ -21362,7 +21377,7 @@ background-color: $(swatchColour)$;
 <div created="20170702141544554" modified="20170702141610959" title="$:/state/toc/top_menu/new-I70-1428808725">
 <pre>close</pre>
 </div>
-<div list="$:/ControlPanel index $:/core/macros/list" title="$:/StoryList">
+<div list="index $:/core/ui/ControlPanel/Modals/AddPlugins" title="$:/StoryList">
 <pre></pre>
 </div>
 <div created="20170702145910656" list="_map $:/core/ui/SideBar/Open $:/core/ui/SideBar/Recent $:/core/ui/SideBar/Tools $:/core/ui/SideBar/More" modified="20170702145921407" title="$:/tags/SideBar">
@@ -21374,7 +21389,7 @@ background-color: $(swatchColour)$;
 <div created="20141104103933533" list="$:/_aa/button/KrTovar $:/_aa/button/KrNavigator $:/core/ui/Buttons/more-tiddler-actions $:/core/ui/Buttons/clone $:/core/ui/Buttons/edit $:/core/ui/Buttons/save-wiki $:/core/ui/Buttons/ShopPublish $:/core/ui/Buttons/home1 $:/core/ui/TopBar/menu $:/core/ui/Buttons/mysearch $:/core/ui/Buttons/close $:/core/ui/Buttons/delete $:/core/ui/Buttons/top_menu $:/core/ui/Buttons/export-tiddler $:/core/ui/Buttons/add_theme $:/core/ui/Buttons/delete_ALL $:/core/ui/Buttons/import" modified="20170929063130499" title="$:/tags/ViewToolbar">
 <pre></pre>
 </div>
-<div created="20170929055315967" modified="20170929055315967" title="$:/temp/_FlagSpecialCss">
+<div created="20171021185322227" modified="20171021185322227" title="$:/temp/_FlagSpecialCss">
 <pre>no</pre>
 </div>
 <div created="20160714192710470" list="" list_caption="" list_color="" list_image150x150="" list_nazvanie="" list_price="" list_size="" list_stoimost="" list_subtitle="" list_v_m3="" list_ves_kg="" modified="20170603084528765" title="$:/temp/_HideStoryList">
@@ -21402,19 +21417,19 @@ background-color: $(swatchColour)$;
         },
         &quot;$:/info/url/full&quot;: {
             &quot;title&quot;: &quot;$:/info/url/full&quot;,
-            &quot;text&quot;: &quot;https://tupper.online/heeg.html&quot;
+            &quot;text&quot;: &quot;file:///C:/Documents%20and%20Settings/%D0%BD%D1%80/%D0%9C%D0%BE%D0%B8%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D1%8B/Downloads/index.html&quot;
         },
         &quot;$:/info/url/host&quot;: {
             &quot;title&quot;: &quot;$:/info/url/host&quot;,
-            &quot;text&quot;: &quot;tupper.online&quot;
+            &quot;text&quot;: &quot;&quot;
         },
         &quot;$:/info/url/hostname&quot;: {
             &quot;title&quot;: &quot;$:/info/url/hostname&quot;,
-            &quot;text&quot;: &quot;tupper.online&quot;
+            &quot;text&quot;: &quot;&quot;
         },
         &quot;$:/info/url/protocol&quot;: {
             &quot;title&quot;: &quot;$:/info/url/protocol&quot;,
-            &quot;text&quot;: &quot;https:&quot;
+            &quot;text&quot;: &quot;file:&quot;
         },
         &quot;$:/info/url/port&quot;: {
             &quot;title&quot;: &quot;$:/info/url/port&quot;,
@@ -21422,7 +21437,7 @@ background-color: $(swatchColour)$;
         },
         &quot;$:/info/url/pathname&quot;: {
             &quot;title&quot;: &quot;$:/info/url/pathname&quot;,
-            &quot;text&quot;: &quot;/heeg.html&quot;
+            &quot;text&quot;: &quot;/C:/Documents%20and%20Settings/%D0%BD%D1%80/%D0%9C%D0%BE%D0%B8%20%D0%B4%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D1%8B/Downloads/index.html&quot;
         },
         &quot;$:/info/url/search&quot;: {
             &quot;title&quot;: &quot;$:/info/url/search&quot;,
@@ -21430,7 +21445,7 @@ background-color: $(swatchColour)$;
         },
         &quot;$:/info/url/origin&quot;: {
             &quot;title&quot;: &quot;$:/info/url/origin&quot;,
-            &quot;text&quot;: &quot;https://tupper.online&quot;
+            &quot;text&quot;: &quot;file://&quot;
         }
     }
 }</pre>
@@ -21511,7 +21526,7 @@ This plugin also requires the JSZip plugin ([[$:/plugins/tiddlywiki/jszip]]) to 
 <div created="20170423085946918" modified="20170826055545900" title="$:/temp/search">
 <pre></pre>
 </div>
-<div created="20170830024832825" modified="20170830024832825" tags="$:/tags/ServerConnection" title="$:/temp/ServerConnection/https://tupper.online/library/v5.1.12/index.html" url="https://tupper.online/library/v5.1.12/index.html">
+<div created="20171021185237332" modified="20171021185237333" tags="$:/tags/ServerConnection" title="$:/temp/ServerConnection/https://tupper.online/library/v5.1.12/index.html" url="https://tupper.online/library/v5.1.12/index.html">
 <pre>loaded</pre>
 </div>
 <div created="20170603084523735" modified="20170603084524876" title="$:/temp/state/filpar/caption/triangle">
@@ -36300,6 +36315,539 @@ window.location.hash="search";
 
 </script>
 </div><div id="API_vk" style="display:none;">
+`
+<script> 
 
+
+(function(w) {
+if (w.fastXDM) return;
+
+var handlers = {};
+var onEnvLoad = [];
+var env = {};
+
+// Key generation
+function genKey() {
+  var key = '';
+  for (i=0;i<5;i++) key += Math.ceil(Math.random()*15).toString(16);
+  return key;
+}
+function waitFor(obj, prop, func, self,  count) {
+  if (obj[prop]) {
+     func.apply(self);
+  } else {
+    count = count || 0;
+    if (count < 1000) setTimeout(function() {
+      waitFor(obj, prop, func, self, count + 1);
+    }, 0);
+  }
+}
+function attachScript(url) {
+  setTimeout(function() {
+    var newScript = document.createElement('script');
+    newScript.type = 'text/javascript';
+    newScript.src = url || w.fastXDM.helperUrl;
+    waitFor(document, 'body', function() {
+      document.getElementsByTagName('HEAD')[0].appendChild(newScript);
+    });
+  }, 0);
+}
+
+// Env functions
+function getEnv(callback, self) {
+  if (env.loaded) {
+    callback.apply(self, [env]);
+  } else {
+    onEnvLoad.push([self, callback]);
+  }
+}
+
+function envLoaded() {
+  env.loaded = true;
+  var i = onEnvLoad.length;
+  while (i--) {
+    onEnvLoad[i][1].apply(onEnvLoad[i][0], [env]);
+  }
+}
+
+function applyMethod(strData, self) {
+  getEnv(function(env) {
+    var data = env.json.parse(strData);
+    if (data[0]) {
+      if (!data[1]) data[1] = [];
+      var i = data[1].length;
+      while (i--) {
+        if (data[1][i]._func) {
+          var funcNum = data[1][i]._func;
+          data[1][i] = function() {
+            var args = Array.prototype.slice.call(arguments);
+            args.unshift('_func'+funcNum);
+            self.callMethod.apply(self, args);
+          };
+        }
+      }
+      setTimeout(function() {
+        if (!self.methods[data[0]]) throw Error('fastXDM: Method ' + data[0] + ' is undefined');
+        self.methods[data[0]].apply(self, data[1]);
+      }, 0);
+    }
+  });
+}
+// XDM object
+w.fastXDM = {
+  _id: 0,
+  helperUrl: ((location.protocol === 'https:') ? 'https:' : 'http:') + '//vk.com/js/api/xdmHelper.js',
+
+  Server: function(methods, filter) {
+    this.methods = methods || {};
+    this.id = w.fastXDM._id++;
+    this.filter = filter;
+    this.key = genKey();
+    this.methods['%init%'] = this.methods['__fxdm_i'] = function() {
+      w.fastXDM.run(this.id);
+      if (this.methods['onInit']) this.methods['onInit']();
+    };
+    this.frameName = 'fXD'+this.key;
+    this.server = true;
+    handlers[this.key] = [applyMethod, this];
+  },
+
+  Client: function(methods) {
+    this.methods = methods || {};
+    this.id = w.fastXDM._id++;
+    w.fastXDM.run(this.id);
+    if (window.name.indexOf('fXD') == 0) {
+      this.key = window.name.substr(3);
+    } ;
+
+    this.caller = window.parent;
+    handlers[this.key] = [applyMethod, this];
+    this.client = true;
+
+    w.fastXDM.on('helper', function() {
+      w.fastXDM.onClientStart(this);
+    }, this);
+
+    getEnv(function(env) {
+      env.send(this, env.json.stringify(['%init%']));
+      var methods = this.methods;
+      setTimeout(function() {
+        if (methods['onInit']) methods['onInit']();
+      }, 0);
+    }, this);
+  },
+
+
+
+  setJSON: function(json) {
+    env.json = json;
+  },
+
+  getJSON: function(callback) {
+    if (!callback) return env.json;
+    getEnv(function(env) {
+      callback(env.json);
+    });
+  },
+
+  setEnv: function(exEnv) {
+    for (i in exEnv) {
+      env[i] = exEnv[i];
+    }
+    envLoaded();
+  },
+
+  _q: {},
+
+  on: function(key, act, self) {
+    if (!this._q[key]) this._q[key] = [];
+    if (this._q[key] == -1) {
+      act.apply(self);
+    } else {
+      this._q[key].push([act, self]);
+    }
+  },
+
+  run: function(key) {
+    var len = (this._q[key] || []).length;
+    if (this._q[key] && len > 0) {
+      for (var i = 0; i < len; i++) this._q[key][i][0].apply(this._q[key][i][1]);
+    }
+    this._q[key] = -1;
+  },
+
+  waitFor: waitFor
+};
+
+w.fastXDM.Server.prototype.start = function(obj, count) {
+  if (obj.contentWindow) {
+    this.caller = obj.contentWindow;
+    this.frame = obj;
+
+    w.fastXDM.on('helper', function() {
+      w.fastXDM.onServerStart(this);
+    }, this);
+
+  } else { // Opera old versions
+    var self = this;
+    count = count || 0;
+    if (count < 50) setTimeout(function() {
+      self.start.apply(self, [obj, count+1]);
+    }, 100);
+  }
+};
+
+function extend(obj1, obj2){
+  for (var i in obj2) {
+    if (obj1[i] && typeof(obj1[i]) == 'object') {
+      extend(obj1[i], obj2[i]);
+    } else {
+      obj1[i] = obj2[i];
+    }
+  }
+}
+
+w.fastXDM.Server.prototype.append = function(obj, options) {
+  var div = document.createElement('DIV');
+  div.innerHTML = '<iframe name="'+this.frameName+'" />';
+  var frame = div.firstChild;
+  var self = this;
+  setTimeout(function() {
+    frame.frameBorder = '0';
+    if (options) extend(frame, options);
+    obj.insertBefore(frame, obj.firstChild);
+    self.start(frame);
+  }, 0);
+  return frame;
+};
+
+w.fastXDM.Client.prototype.callMethod = w.fastXDM.Server.prototype.callMethod = function() {
+  var args = Array.prototype.slice.call(arguments);
+  var method = args.shift();
+  var i = args.length;
+  while (i--) {
+    if (typeof(args[i]) == 'function') {
+      this.funcsCount = (this.funcsCount || 0) + 1;
+      var func = args[i];
+      var funcName = '_func' + this.funcsCount;
+      this.methods[funcName] = function() {
+        func.apply(this, arguments);
+        delete this.methods[funcName];
+      };
+      args[i] = {_func: this.funcsCount};
+    }
+  }
+  waitFor(this, 'caller', function() {
+    w.fastXDM.on(this.id, function() {
+      getEnv(function(env) {
+        env.send(this, env.json.stringify([method, args]));
+      }, this);
+    }, this);
+  }, this);
+};
+
+if (w.JSON && typeof(w.JSON) == 'object' && w.JSON.parse && w.JSON.stringify && w.JSON.stringify({a:[1,2,3]}).replace(/ /g, '') == '{"a":[1,2,3]}') {
+  env.json = {parse: w.JSON.parse, stringify: w.JSON.stringify};
+} else {
+  w.fastXDM._needJSON = true;
+}
+
+// PostMessage cover
+if (w.postMessage) {
+  env.protocol = 'p';
+  env.send = function(xdm, strData) {
+    // alert(key+':'+strData);
+    xdm.caller.postMessage(xdm.key+':'+strData, "*");
+  };
+  if (w.addEventListener) {
+    w.addEventListener("message", w.fastXDM.onMessage, false);
+  } else {
+    w.attachEvent("onmessage", w.fastXDM.onMessage);
+  }
+
+  if (w.fastXDM._needJSON) {
+    w.fastXDM._onlyJSON = true;
+    attachScript();
+  } else {
+    envLoaded();
+  }
+} else {
+  attachScript();
+}
+})(window);
+
+if (typeof(VK) == 'undefined') VK = {};
+
+VK._Rpc = null;
+VK._v = false;
+VK._callbacks = {};
+VK._initQueue = [];
+VK._inited = false;
+
+VK.init = function(success, failure, ver) {
+  if (ver) {
+    VK._v = ver;
+  }
+  if (!VK._inited) {
+  	VK._inited = true;
+    if (!parent) failure();
+    window.vk_onConnectionInit = function() {
+      if (VK.isFunc(success)) success();
+    };
+    VK.initXDConn();
+  } else {
+    if (VK.isFunc(success)) success();
+  }
+};
+
+VK.initXDConn = function() {
+
+  if (window.name.length > 10) {
+
+
+
+  } else {
+    VK.fxdm = true;
+    VK._Rpc = new fastXDM.Client({
+      onInit: function() {
+          while (VK._initQueue.length > 0) {
+            var func = VK._initQueue.pop();
+            if (VK.isFunc(func)) func();
+          }
+        window.vk_onConnectionInit();
+      },
+      runCallback: function(args) {
+        var eventName;
+        eventName = args.shift();
+        if (VK.isFunc(VK._callbacks[eventName])) VK._callbacks[eventName].apply(VK,args);
+      },
+      getHeight: function(callback) {
+        var calcHeight = function() {
+          var height = document.body.offsetHeight;
+          if (height) {
+            if (window.getComputedStyle !== undefined) {
+              var st = window.getComputedStyle(document.body, null);
+              height += parseInt(st.getPropertyValue('margin-top').replace('px', ''));
+              height += parseInt(st.getPropertyValue('margin-bottom').replace('px', ''));
+            } else {
+              height += parseInt(document.body.currentStyle['marginTop'].replace('px', ''));
+              height += parseInt(document.body.currentStyle['marginBottom'].replace('px', ''));
+            }
+            return height;
+          } else {
+            return document.body.scrollHeight;
+          }
+        };
+        var resize = function() {
+          VK._Rpc.callMethod('setHeight', calcHeight());
+        };
+
+        setInterval(resize, 1000);
+        document.addEventListener("click", function() {
+          setTimeout(resize, 0);
+        }, false);
+        document.addEventListener("DOMSubtreeModified", function() {
+          setTimeout(resize, 0);
+        });
+        return callback(calcHeight());
+      }
+    });
+
+    VK._Rpc.ApiCall = function(args, callback) {
+      VK._Rpc.callMethod('ApiCall', args, callback);
+    };
+  }
+};
+
+VK.callMethod = function() {
+  var args = Array.prototype.slice.call(arguments);
+  var callback;
+  if (VK._Rpc != null) {
+    if (VK.fxdm) {
+      VK._Rpc.callMethod.apply(VK._Rpc, args);
+    } else {
+      if (VK.isFunc(args[args.length-1])) callback = args.pop();
+      VK._Rpc.callMethod(args,callback);
+    }
+  } else {
+    VK._initQueue.push(function() {VK.callMethod.apply(VK, args);});
+    VK.init();
+  }
+};
+
+VK.addCallback = function(eventName, callback) {
+  if (callback) VK._callbacks[eventName] = callback;
+};
+
+VK.removeCallback = function(eventName) {
+  if (VK._callbacks[eventName]) delete VK._callbacks[eventName];
+};
+
+VK.isFunc = function(obj) {
+  return Object.prototype.toString.call(obj) === "[object Function]";
+};
+
+VK.params = {};
+
+VK.loadParams = function(q) {
+  if (typeof q == 'Object') VK.params = q;
+  else {
+    var tmp = q.substr(q.indexOf('?') + 1).split('&');
+    var i = tmp.length;
+    while (i--) {
+      var v = tmp[i].split('=');
+      VK.params[v[0]] = decodeURIComponent(v[1]);
+    }
+  }
+};
+
+VK.addScript = function(url) {
+  var el = document.createElement('script');
+  el.type = 'text/javascript';
+  el.src = url;
+  document.getElementsByTagName('head')[0].appendChild(el);
+};
+
+VK.api = function() {
+  var args = Array.prototype.slice.call(arguments);
+  var callback;
+  if (VK._Rpc != null) {
+    if (VK.isFunc(args[args.length-1])) {
+      callback = args.pop();
+    }
+    if (!args[1]) {
+      args[1] = {};
+    }
+    if (!args[1]['v'] && VK._v) {
+      args[1]['v'] = VK._v;
+    }
+    VK._Rpc.ApiCall(args,callback);
+  } else {
+    VK._initQueue.push(function() {VK.api.apply(VK, args);});
+    VK.init();
+  }
+};
+
+VK.Modules = {
+  callbacks: {},
+  loaded: function(name) {
+    if (this.callbacks[name]) {
+      var i = this.callbacks[name].length;
+      while (i--) {
+        if (VK.isFunc(this.callbacks[name][i])) this.callbacks[name][i]();
+      }
+    }
+  },
+  load: function(name, callback, path) {
+    if (!this.callbacks[name]) {
+      this.callbacks[name] = [callback];
+      if (path == null) path = 'http://vk.com/js/api/modules/' + name + '.js';
+      VK.addScript(path);
+    } else {
+      this.callbacks[name].push(callback);
+    }
+  }
+};
+
+VK.showPortlet = function(opts) {
+  VK.callMethod('showPortlet', opts);
+};
+
+if (VK._protocol !== 'https:') {
+  VK._protocol = ((location.protocol === 'https:') ? 'https:' : 'http:');
+}
+if (VK._protocol !== 'https:') {
+  VK.callMethod('getLocationProtocol', function(protocol) {
+    if (protocol === 'https:') {
+      VK._protocol = 'https:';
+    }
+  });
+}
+(function(){
+  try {
+    var scripts = document.getElementsByTagName('script');
+    var script = scripts[scripts.length - 1];
+    VK._base_domain = script.src.match(/^https?:\/\/((?:\w+\.)*vk.com)/)[1];
+  } catch (e) {}
+})();
+
+if (!VK.Widgets) {
+  VK.Widgets = (function() {
+    var obj = {};
+    var widgetlist = ['Comments', 'CommentsBrowse', 'Auth', 'Group', 'Post', 'Donate', 'Like', 'Poll', 'Recommended', 'Subscribe', 'Ads'];
+    VK.xdConnectionCallbacks = [];
+    var i = widgetlist.length;
+    while (i--) (function(f) {
+      obj[f] = function() {
+        var args = arguments;
+
+        VK.xdConnectionCallbacks.push(function() {
+          VK._iframeAppWidget = true;
+          VK.Widgets[f].apply(VK, args);
+        });
+
+        if (!VK._openApiAttached) {
+          VK.callMethod('_getAppInfo', function(data) {
+            var baseDomain = ((VK._base_domain && VK._base_domain.match(/^(\w+\.)*vk.com$/)) ? VK._base_domain : 'vk.com');
+            VK._apiId = data[0];
+            VK._browserHash = data[1];
+            VK.addScript(VK._protocol + '//' + baseDomain + '/js/api/openapi.js?116');
+          });
+          VK._openApiAttached = true;
+        }
+
+      };
+    })(widgetlist[i]);
+    return obj;
+  })();
+}
+
+
+/* Obsolete methods */
+VK.External={showPaymentBox:function(a){VK.callMethod("showPaymentBox",a);},showSettingsBox:function(a){VK.callMethod("showSettingsBox",a);},showInstallBox:function(){VK.callMethod("showInstallBox");},showInviteBox:function(){VK.callMethod("showInviteBox");},resizeWindow:function(b,a){VK.callMethod("resizeWindow",b,a);},scrollWindow:function(b,a){VK.callMethod("scrollWindow",b,a);},setLocation:function(a,b){VK.callMethod("setLocation",a,b);},setTitle:function(a){VK.callMethod("setTitle",a);},saveWallPost:function(a){VK.callMethod("saveWallPost",a);},showProfilePhotoBox:function(a){VK.callMethod("showProfilePhotoBox",a);},showMerchantPaymentBox:function(a){VK.callMethod("showMerchantPaymentBox",a);}};
+
+
+function onLocationChanged(loc) {
+    if(window.location.pathname != loc && loc != '') {
+        window.location.href = window.location.toString().split('#')[0] +"#"+ loc;
+    }
+}
+
+function vkwidth() {
+var vkwidth=document.querySelector('[title="$:/constant/_vkwidth"] > pre').innerHTML;
+
+VK.init(function() {
+
+VK.callMethod("resizeWindow", vkwidth, document.body.scrollHeight+40);
+
+VK.callMethod("setLocation", location.hash.slice(1));
+ VK.addCallback('onLocationChanged', onLocationChanged);
+
+
+
+});
+}
+
+
+
+function modalTop() {
+VK.addCallback('onScrollTop', function(scroll){
+newscroll=scroll-80;
+document.querySelector('.tc-modal').style.top = newscroll + 'px'; 
+
+});
+VK.callMethod('scrollTop'); 
+
+}
+
+
+
+
+
+
+
+
+</script>
+`
 </div></body>
 </html>
