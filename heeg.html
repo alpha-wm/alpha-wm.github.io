@@ -14,10 +14,13 @@ window.onload = (function() {   // когда загрузится вся стр
     
     VK.loadParams(document.location.href);  // получаем параметры запуска приложения
     var viewer_id = VK.params.viewer_id;
-   
+    alert("ок");
     VK.api("users.get", {'user_ids' : 1}, function(data) {         // обрабатываем полученные данные
         // выводим имя и фамилию в блок user_info
-        document.getElementById('user_info').innerHTML = data.response[0].last_name + ' ' + data.response[0].last_name + '<br />';        // создаем img, для отображения аватарки
+        document.getElementById('user_info').innerHTML = data.response[0].last_name + ' ' + data.response[0].last_name + '<br />';        
+alert(data.response[0].last_name);
+
+// создаем img, для отображения аватарки
         var image=document.createElement('img');
         // из полученных данных берем ссылку на фото
         image.src=data.response[0].photo_big;
