@@ -1,28 +1,23 @@
-﻿<html>
-<head>
-<!-- подключаем xd_connection.js -->
-<script src="http://vkontakte.ru/js/api/xd_connection.js?2" type="text/javascript"></script>
-<script type="text/javascript" charset="cp1251" >
-window.onload = (function() {   // когда загрузится вся страница
-    VK.init(function() {    // инициализируем Vk API
-    
-    VK.loadParams(document.location.href);
-    var viewer_id = VK.params.viewer_id;
-    
-    VK.api("users.get", {user_ids:viewer_id,fields:"photo_50"}, function(data) {         // обрабатываем полученные данные
-        // выводим имя и фамилию в блок user_info
-        document.getElementById('user_info').innerHTML = data.response[0].first_name + ' ' + data.response[0].last_name + '<br />';        // создаем img, для отображения аватарки
-        var image=document.createElement('img');
-        // из полученных данных берем ссылку на фото
-        image.src=data.response[0].photo_50;
-        // добавляем img в блок user_info
-        user_info.appendChild(image);
-    });
-    });
-});
-</script>
-</head>
-<body>
-<div id="user_info"></div>
-</body>
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>test</title>
+    </head>
+    <body>
+        <script src="https://vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
+        
+        <script type="text/javascript"> 
+            VK.init(function(){
+                alert("good");
+            }, function(){
+                alert("bad");
+            }, '5.62');
+        </script>
+        
+        <script type="text/javascript">
+            VK.api("users.get", {'user_ids' : 1}, function(data) { 
+               console.log(data.response[0].last_name);
+            });
+        </script>
+    </body>
 </html>
