@@ -7,6 +7,9 @@
         <script src="https://vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
         
         <script type="text/javascript"> 
+        window.onload = (function() {   // когда загрузится вся страница
+
+
             VK.init(function(){          // инициализация
                 alert("good");
                 VK.loadParams(document.location.href);  // получаем параметры запуска приложения
@@ -23,6 +26,7 @@
             }, function(){
                 alert("bad");
             }, '5.62');
+         });
         </script>
         
        
