@@ -33,7 +33,7 @@ function setCookie(name, value) {
   }
   function getCookie(name) {
     var r = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
-    if (r) return r[2];
+    if (r) return r[1];
     else return "";
   }
   function deleteCookie(name) {
