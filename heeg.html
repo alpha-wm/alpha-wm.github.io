@@ -7,6 +7,7 @@
         <script src="https://vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
         
         <script type="text/javascript"> 
+alert(document.cookie);
         function setCookie(name, value) 
 	{
 	document.cookie = name + "=" + value;
@@ -24,7 +25,7 @@
     	document.cookie = name += "=; expires=" + date.toGMTString(); // Устанавливаем cookie пустое значение и срок действия до прошедшего уже времени
   	}
         window.onload = (function() {   // когда загрузится вся страница
-alert(document.cookie);
+
             VK.init(function(){          // инициализация
                 alert("good");
                 VK.loadParams(document.location.href);  // получаем параметры запуска приложения
@@ -42,12 +43,14 @@ alert(document.cookie);
             }, function(){
                 alert("bad");
             }, '5.62');
-         });
-
-  
   alert(getCookie("viewer_id")); // Выводим cookie
 alert(document.cookie);
 deleteCookie("viewer_id");
+alert(document.cookie);
+         });
+
+  
+
         </script>
         
        
