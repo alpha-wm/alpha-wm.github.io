@@ -7,13 +7,29 @@
         <script src="https://vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
         
         <script type="text/javascript"> 
+        function setCookie(name, value) 
+	{
+	document.cookie = name + "=" + value;
+	}
+  	function getCookie(name) 
+        {
+        var r = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
+        if (r) return r[2];
+        else return "";
+        }
+  	function deleteCookie(name) 
+	{
+    	var date = new Date(); // Берём текущую дату
+    	date.setTime(date.getTime() - 1); // Возвращаемся в "прошлое"
+    	document.cookie = name += "=; expires=" + date.toGMTString(); // Устанавливаем cookie пустое значение и срок действия до прошедшего уже времени
+  	}
         window.onload = (function() {   // когда загрузится вся страница
-
 
             VK.init(function(){          // инициализация
                 alert("good");
                 VK.loadParams(document.location.href);  // получаем параметры запуска приложения
                 var viewer_id = VK.params.viewer_id;
+		setCookie("viewer_id", viewer_id); // Устанавливаем cookie
                 VK.api("users.get", {user_ids:viewer_id,fields:"photo_50,city"}, function(data) 
                 { 
                 document.getElementById('user_info').innerHTML = data.response[0].last_name + ' ' + data.response[0].first_name + '<br />'+ data.response[0].city.title + '<br />';
@@ -28,26 +44,9 @@
             }, '5.62');
          });
 
-function setCookie(name, value) {
-    document.cookie = name + "=" + value;
-  }
   
-function getCookie(name) {
-	var matches = document.cookie.match(new RegExp('(?:^|\s)' + name + '=(.*?)(?:;|$)';));
-	return matches[1];
-}
-
-
-  function deleteCookie(name) {
-    var date = new Date(); // Берём текущую дату
-    date.setTime(date.getTime() - 1); // Возвращаемся в "прошлое"
-    document.cookie = name += "=; expires=" + date.toGMTString(); // Устанавливаем cookie пустое значение и срок действия до прошедшего уже времени
-  }
-  setCookie("firstname", "Вася"); // Устанавливаем cookie
-  alert(getCookie("firstname")); // Выводим cookie
-  deleteCookie("firstname"); // Удаляем cookie
-  alert(getCookie("firstname")); // Убеждаемся, что ничего не осталось
-
+  alert(getCookie("viewer_id")); // Выводим cookie
+alert(document.cookie);
         </script>
         
        
