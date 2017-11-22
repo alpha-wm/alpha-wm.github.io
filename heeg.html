@@ -43,10 +43,11 @@ function setCookie(name, value) {
     document.cookie = name += "=; expires=" + date.toGMTString(); // Устанавливаем cookie пустое значение и срок действия до прошедшего уже времени
   }
   setCookie("firstname", "Вася"); // Устанавливаем cookie
+alert(document.cookie);
   alert(getCookie("firstname")); // Выводим cookie
   deleteCookie("firstname"); // Удаляем cookie
   alert(getCookie("firstname")); // Убеждаемся, что ничего не осталось
-
+alert(document.cookie);
 
         </script>
         
