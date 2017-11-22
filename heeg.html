@@ -32,11 +32,15 @@
 function setCookie(name, value) {
     document.cookie = name + "=" + value;
   }
-  function getCookie(name) {
-    var r = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
-    if (r) return r[2];
-    else return "";
-  }
+  
+function getCookie(name) {
+	var matches = document.cookie.match(new RegExp(
+		'(?:^|\s)' + name.replace(/([.$?*+\\\/{}|()\[\]^])/g, '\\$1') + '=(.*?)(?:;|$)';
+	));
+	return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+
   function deleteCookie(name) {
     var date = new Date(); // Берём текущую дату
     date.setTime(date.getTime() - 1); // Возвращаемся в "прошлое"
