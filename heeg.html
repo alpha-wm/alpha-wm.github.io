@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>test</title>
+    </head>
+    <body>
+        <script src="https://vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
+        
+        <script type="text/javascript"> 
+        window.onload = (function() {   // когда загрузится вся страница
+
+
+            VK.init(function(){          // инициализация
+                alert("good");
+                VK.loadParams(document.location.href);  // получаем параметры запуска приложения
+                var viewer_id = VK.params.viewer_id;
+                VK.api("users.get", {user_ids:viewer_id,fields:"photo_50,city"}, function(data) 
+                { 
+                document.getElementById('user_info').innerHTML = data.response[0].last_name + ' ' + data.response[0].first_name + '<br />'+ data.response[0].city.title + '<br />';
+                var image=document.createElement('img');
+                // из полученных данных берем ссылку на фото
+                image.src=data.response[0].photo_50;
+                // добавляем img в блок user_info
+                user_info.appendChild(image);
+                });
+            }, function(){
+                alert("bad");
+            }, '5.62');
+         });
+        </script>
+        
+       alert(document.cookie);
+
+<div id="user_info"></div>
+
+    </body>
+</html>
+
+
+
+
