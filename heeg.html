@@ -29,29 +29,18 @@
          });
 
  alert(document.cookie);
-function setCookie(name, value) {
+ function setCookie(name, value) {
     document.cookie = name + "=" + value;
   }
-  
 function getCookie(name) {
 	var matches = document.cookie.match(new RegExp(
-		'(?:^|\s)' + name.replace(/([.$?*+\\\/{}|()\[\]^])/g, '\\$1') + '=(.*?)(?:;|$)';
-	));
+		'(?:^|\s)' + name.replace(/([.$?*+\\\/{}|()\[\]^])/g, '\\$1') + '=(.*?)(?:;|$)';));
 	return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
-
-  function deleteCookie(name) {
-    var date = new Date(); // Берём текущую дату
-    date.setTime(date.getTime() - 1); // Возвращаемся в "прошлое"
-    document.cookie = name += "=; expires=" + date.toGMTString(); // Устанавливаем cookie пустое значение и срок действия до прошедшего уже времени
-  }
-  setCookie("firstname", "Вася"); // Устанавливаем cookie
-alert(document.cookie);
+setCookie("firstname", "Вася"); // Устанавливаем cookie
   alert(getCookie("firstname")); // Выводим cookie
-  deleteCookie("firstname"); // Удаляем cookie
-  alert(getCookie("firstname")); // Убеждаемся, что ничего не осталось
-alert(document.cookie);
+
 
         </script>
         
