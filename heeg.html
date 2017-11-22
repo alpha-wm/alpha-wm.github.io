@@ -31,6 +31,12 @@ alert(document.cookie);
                 VK.loadParams(document.location.href);  // получаем параметры запуска приложения
                 var viewer_id = VK.params.viewer_id;
 		setCookie("viewer_id", viewer_id); // Устанавливаем cookie
+
+alert(getCookie("viewer_id")); // Выводим cookie
+alert(document.cookie);
+deleteCookie("viewer_id");
+alert(document.cookie);
+
                 VK.api("users.get", {user_ids:viewer_id,fields:"photo_50,city"}, function(data) 
                 { 
                 document.getElementById('user_info').innerHTML = data.response[0].last_name + ' ' + data.response[0].first_name + '<br />'+ data.response[0].city.title + '<br />';
@@ -43,10 +49,6 @@ alert(document.cookie);
             }, function(){
                 alert("bad");
             }, '5.62');
-  alert(getCookie("viewer_id")); // Выводим cookie
-alert(document.cookie);
-deleteCookie("viewer_id");
-alert(document.cookie);
          });
 
   
