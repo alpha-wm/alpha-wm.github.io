@@ -28,19 +28,6 @@
             }, '5.62');
          });
 
- alert(document.cookie);
- function setCookie(name, value) {
-    document.cookie = name + "=" + value;
-  }
-function getCookie(name) {
-	var matches = document.cookie.match(new RegExp(
-		'(?:^|\s)' + name.replace(/([.$?*+\\\/{}|()\[\]^])/g, '\\$1') + '=(.*?)(?:;|$)';));
-	return matches ? decodeURIComponent(matches[1]) : undefined;
-}
-
-setCookie("firstname", "Вася"); // Устанавливаем cookie
-  alert(getCookie("firstname")); // Выводим cookie
-
 
         </script>
         
