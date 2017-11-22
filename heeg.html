@@ -36,7 +36,7 @@ function getCookie(name) {
 	var matches = document.cookie.match(new RegExp(
 		'(?:^|\s)' + name + '=(.*?)(?:;|$)';
 	));
-	return matches[2];
+	return matches[1];
 }
 
 
