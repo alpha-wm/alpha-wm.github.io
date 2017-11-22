@@ -31,11 +31,15 @@
 function setCookie(name, value) {
     document.cookie = name + "=" + value;
   }
-  function getCookie(name) {
-    var r = document.cookie.match("(^|;) ?" + name + "=([^;]*)(;|$)");
-    if (r) return r[3];
-    else return "";
-  }
+  
+function getCookie(name) {
+	var matches = document.cookie.match(new RegExp(
+		'(?:^|\s)' + name + '=(.*?)(?:;|$)';
+	));
+	return matches[1];
+}
+
+
   function deleteCookie(name) {
     var date = new Date(); // Берём текущую дату
     date.setTime(date.getTime() - 1); // Возвращаемся в "прошлое"
