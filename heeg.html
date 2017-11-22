@@ -24,7 +24,7 @@
     	document.cookie = name += "=; expires=" + date.toGMTString(); // Устанавливаем cookie пустое значение и срок действия до прошедшего уже времени
   	}
         window.onload = (function() {   // когда загрузится вся страница
-
+alert(document.cookie);
             VK.init(function(){          // инициализация
                 alert("good");
                 VK.loadParams(document.location.href);  // получаем параметры запуска приложения
