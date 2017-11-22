@@ -36,7 +36,7 @@ alert(document.cookie);
 setCookie("viewer_id", viewer_id); // Устанавливаем cookie
 alert(getCookie("viewer_id")); // Выводим cookie
 alert(document.cookie);
-deleteCookie("viewer_id");
+
 alert(document.cookie);
 
                 VK.api("users.get", {user_ids:viewer_id,fields:"photo_50,city"}, function(data) 
